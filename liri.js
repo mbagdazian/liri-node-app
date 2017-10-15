@@ -5,7 +5,14 @@ var request = require('request');
 var fs = require('fs');
 
 var input = process.argv[2];
-var UserInput = process.argv[3];
+var UserInput = "";
+
+//for loop
+for (var i = 3; i < process.argv.length; i++){
+	 UserInput += process.argv[i] + " ";
+	 console.log(UserInput);
+};
+
 
 var myTweetsFN = function(){
 			if (input === "my-tweets"){
@@ -47,12 +54,12 @@ var spotifyFN = function(){
         console.log('================ Song Info ================');
         console.log('Artist: ' + record.artists[0].name);
         console.log('Name: ' + record.name);
+        //make if statement for preview_url
         console.log('Link: ' + record.preview_url);
         console.log('Album: ' + record.album.name);
         console.log('===========================================');
         console.log(' ');
 
-        app.logData(data);
       } else {
         console.log('No song data found.');
       } 
@@ -62,11 +69,12 @@ var spotifyFN = function(){
 
 var movieThis = function(){
 	if (input === "movie-this"){
-    request('http://www.omdbapi.com/?t=' + UserInput +'&tomatoes=true', function (error, response) {
+		//add API key to URL
+    request("http://www.omdbapi.com/?t=" + UserInput + "&y=&plot=short&apikey=40e9cece", function (error, response, body) {
       if (!error && response.statusCode == 200) {
-      	console.log(response);
-
-        var movieData = JSON.parse(info);
+      	//console.log(response);
+//
+        var movieData = JSON.parse(body);
 
         console.log('================ Movie Info ================');
         console.log('Title: ' + movieData.Title);
@@ -81,7 +89,6 @@ var movieThis = function(){
         console.log('===========================================');
 
 
-        app.logData(movieData);
       }
     });
   };
@@ -89,8 +96,32 @@ var movieThis = function(){
 
 //Do-what-it-says function. 
 
+var DoWhatItSays = function(){
+	if (input ==="do-what-it-says"){
+		fs.readFile('random.txt', "utf8", function(err, data) {
+  		if (err) throw err;
+  		console.log(data);
+  		var array = data.split(",");
+  		console.log(array);
+  		//take the two strings from the array to "dowhatitsays" arg 0, and the "i want it that way" which would be 1
+//and I need to push them to the command line when we run do-what-it-says so that the actual command runs
+		 input = array[0];
+		 UserInput = array[1];
+		console.log(input);
+		console.log(UserInput);
+
+		DoWhatItSays();
+		myTweetsFN();
+		spotifyFN();
+		movieThis();
 
 
+		});
+	};
+};
+
+
+DoWhatItSays();
 myTweetsFN();
 spotifyFN();
 movieThis();
